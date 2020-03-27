@@ -126,6 +126,536 @@ e:=Size(U1);
 
 return e; 
 end);
+##################################
+#################################
+# (27/03/2020) Character Descent Functions
+# - added by Allen Herman to optimize Clifford theory reductions
+# needed for the Local Index functions to give correct output, 
+# this fixes the bug created by the new WedderburnDecompositionInfo 
+# command outputting crossed product algebras that are wildly 
+# ramified at odd primes, which the Local Index functions were 
+# not designed to handle. 
+##################################
+################################################
+# 2) Add a new Global Splitting function that   
+#    reduces algebras whose factor set has too 
+#    many zeroes or is globally trivial. 
+################################################
+InstallGlobalFunction( GlobalSplittingOfCyclotomicAlgebra, function(A)
+local A1,m,F,a1,m1,a,b,c,n,m2,g,g1,g2,g3,b1,c1,a2,b2,c2,F1,f,F2,t,d,d1,b11,i,j;
+
+A1:=A;
+if Length(A)=5 then
+
+F:=A[2];
+if ForAll(A[4],x->x[3]=0) and ForAll(A[5],x->ForAll(x,y->y=0)) then
+    return [A[1]*Product(A[4],x->x[1]),F];
+fi;
+
+A:=A1; 
+if Length(A)=5 and Length(A[4])=2 then 
+
+A1:=A;
+if not(A[5][1][1]=0) then 
+m:=A[1]; 
+a1:=A[4][1][1];
+b1:=A[4][1][2];
+c1:=A[4][1][3];
+a2:=A[4][2][1];
+b2:=A[4][2][2]; 
+c2:=A[4][2][3];
+d:=A[5][1][1];
+F:=A[2];
+a:=PrimitiveElement(F);
+m1:=A[3]; 
+F2:=Field([a,E(m1)]); 
+
+t:=0;
+for i in [1..m1-1] do 
+if ((((1-b2)*i-d) mod m1) = (0 mod m1)) then
+d1:=1;
+for j in [1..(a1-1)] do 
+d1:=1+b1*d1; 
+od;  
+A1:=[m,F,m1,[[a1,b1,((c1+i*d1) mod m1)],[a2,b2,c2]],[[0]]]; 
+t:=1;
+break;
+fi; 
+od;
+
+if t=0 then 
+b11:=PowerMod(b1,-1,m1);  
+for i in [1..m1-1] do 
+if ((((b11-1)*i-d) mod m1) = (0 mod m1)) then
+d1:=1;
+for j in [1..(a2-1)] do 
+d1:=1+b2*d1; 
+od;  
+A1:=[m,F,m1,[[a1,b1,c1],[a2,b2,((c2+i*d1) mod n)]],[[0]]]; 
+t:=1;
+break;
+fi; 
+od; 
+fi;
+
+fi;
+
+A:=A1;
+
+if A[4][2][3]=0 and A[5][1][1]=0 then 
+m:=A[1]; 
+a1:=A[4][1][1];
+b1:=A[4][1][2];
+c1:=A[4][1][3];
+a2:=A[4][2][1];
+b2:=A[4][2][2]; 
+c2:=A[4][2][3];
+F:=A[2];
+a:=PrimitiveElement(F);
+m1:=A[3]; 
+F2:=Field([a,E(m1)]); 
+
+for m2 in [2..m1-1] do 
+if GaloisCyc(E(m1)^m2,b2)=E(m1)^m2 then 
+g1:=E(m1)^m2; 
+break; 
+fi; 
+od; 
+
+if OrderMod(b1,Order(g1))= a1 then 
+f:=Order(g1); 
+for m2 in [2..a1] do 
+if g1^m2 = E(m1)^c1 then 
+c1:=m2; 
+break;
+fi;
+od; 
+A1:=[m*a2, F, f, [a1,b1 mod f,c1]]; 
+fi; 
+
+fi;
+
+if A[4][1][3]=0 and A[5][1][1]=0 then 
+m:=A[1]; 
+a1:=A[4][1][1];
+b1:=A[4][1][2];
+c1:=A[4][1][3];
+a2:=A[4][2][1];
+b2:=A[4][2][2]; 
+c2:=A[4][2][3];
+F:=A[2];
+a:=PrimitiveElement(F);
+m1:=A[3]; 
+F2:=Field([a,E(m1)]); 
+
+for m2 in [2..m1-1] do 
+if GaloisCyc(E(m1)^m2,b1)=E(m1)^m2 then 
+g1:=E(m1)^m2; 
+break; 
+fi; 
+od; 
+
+if OrderMod(b2,Order(g1))= a2 then 
+f:=Order(g1); 
+for m2 in [2..a2] do 
+if g1^m2 = E(m1)^c2 then 
+c2:=m2; 
+break;
+fi;
+od; 
+A1:=[m*a1, F, f, [a2,b2 mod f,c2]]; 
+fi; 
+
+fi;
+
+fi;
+fi;
+
+A:=A1;
+
+if Length(A) = 4 then 
+
+F:=A[2];
+a1:=PrimitiveElement(F);
+m1:=A[3];
+a:=A[4][1];
+b:=A[4][2];
+c:=A[4][3];
+
+n:=Conductor(F);
+if IsOddInt(n) then n:=2*n; fi;
+for m2 in [1..n] do 
+  if E(n)^m2 in F then 
+     break; 
+  fi;
+od;  
+g:=Order((E(n)^m2)^a);
+
+g1:=E(m1);
+for m2 in [1..(a-1)] do 
+g1:=E(m1)*g1^b; 
+od; 
+g1:=Order(g1);
+
+g2:=Order(E(m1)^c);
+g3:=Lcm(g,g1);
+if (g3/g2 in Integers) then 
+ A1:=[A[1]*a,F]; 
+fi;
+
+fi;
+
+return A1;
+end); 
+#######################################################
+# Finds group over which cyclotomic algebra of length 4 or 5 
+# is faithfully represented.
+#######################################################
+InstallGlobalFunction( DefiningGroupAndCharacterOfCyclotAlg, function(A)
+local l,f,a,b,c,d,g,I,g1,S,m,n,i,chi,F,u,V,U,F1;;
+
+l:=Length(A);
+g1:="fail";
+
+if (l=5 and Length(A[4])=2) then 
+f:=FreeGroup("a","b","c");
+a:=f.1;
+b:=f.2;
+c:=f.3;
+g:=f/[a^A[3],b^A[4][1][1]*a^(-A[4][1][3]),c^A[4][2][1]*a^(-A[4][2][3]),b^(-1)*a*b*a^(-A[4][1][2]),c^(-1)*a*c*a^(-A[4][2][2]),c^(-1)*b^(-1)*c*b*a^(-A[5][1][1])];
+fi;
+
+if (l=5 and Length(A[4])=3) then 
+f:=FreeGroup("a","b","c","d");
+a:=f.1;
+b:=f.2;
+c:=f.3;
+d:=f.4;
+g:=f/[a^A[3],b^A[4][1][1]*a^(-A[4][1][3]),c^A[4][2][1]*a^(-A[4][2][3]),d^A[4][3][1]*a^(-A[4][3][3]), b^(-1)*a*b*a^(-A[4][1][2]),c^(-1)*a*c*a^(-A[4][2][2]), d^(-1)*a*d*a^(-A[4][3][2]),    c^(-1)*b^(-1)*c*b*a^(-A[5][1][1]), d^(-1)*b^(-1)*d*b*a^(-A[5][1][2]),d^(-1)*c^(-1)*d*c*a^(-A[5][2][1])];
+fi;
+
+if (l=4) then 
+f:=FreeGroup("a","b");
+a:=f.1;
+b:=f.2;
+g:=f/[a^A[3],b^A[4][1]*a^(-A[4][3]),b^(-1)*a*b*a^(-A[4][2])];
+fi;
+
+I:=IsomorphismSpecialPcGroup(g);
+g1:=Image(I);
+
+S:=[];
+S[1]:=g1;
+
+if Length(A)=2 then d:=1; fi;
+if Length(A)=4 then d:=A[4][1]; F1:=NF(A[3],[A[4][2]]); fi; 
+if (Length(A)=5 and Length(A[4])=2) then 
+   d:=A[4][1][1]*A[4][2][1]; 
+   F1:=NF(A[3],[A[4][1][2],A[4][2][2]]); 
+fi;
+if (Length(A)=5 and Length(A[4])=3) then 
+   d:=A[4][1][1]*A[4][2][1]*A[4][3][1]; 
+   F1:=NF(A[3],[A[4][1][2],A[4][2][2],A[4][3][2]]); 
+fi;
+
+n:=Size(Irr(g1)) ;
+m:=Trace(F1,Rationals,1);
+U:=[];
+for i in [1..n] do 
+chi:=Irr(g1)[n-i+1];
+V:=ValuesOfClassFunction(chi); 
+F:=FieldByGenerators(V);
+if V[1]/d in PositiveIntegers then 
+if Size(KernelOfCharacter(chi))=1 then 
+if FieldByGenerators(V)=F1 then 
+	Add(U,n-i+1); 
+fi; 
+fi;
+fi;
+od;
+if Size(U)=m then 
+u:=U[1];
+chi:=Irr(g1)[u];
+else
+chi:=U;
+fi;
+
+S[2]:=chi;
+
+return S;
+end);
+
+#######################################################
+InstallGlobalFunction( DefiningGroupOfCyclotomicAlgebra, function(A)
+local l,f,a,b,c,d,g,I,g1;
+
+l:=Length(A);
+g1:="fail";
+
+if (l=5 and Length(A[4])=2) then 
+f:=FreeGroup("a","b","c");
+a:=f.1;
+b:=f.2;
+c:=f.3;
+g:=f/[a^A[3],b^A[4][1][1]*a^(-A[4][1][3]),c^A[4][2][1]*a^(-A[4][2][3]),b^(-1)*a*b*a^(-A[4][1][2]),c^(-1)*a*c*a^(-A[4][2][2]),c^(-1)*b^(-1)*c*b*a^(-A[5][1][1])];
+fi;
+
+if (l=5 and Length(A[4])=3) then 
+f:=FreeGroup("a","b","c","d");
+a:=f.1;
+b:=f.2;
+c:=f.3;
+d:=f.4;
+g:=f/[a^A[3],b^A[4][1][1]*a^(-A[4][1][3]),c^A[4][2][1]*a^(-A[4][2][3]),d^A[4][3][1]*a^(-A[4][3][3]), b^(-1)*a*b*a^(-A[4][1][2]),c^(-1)*a*c*a^(-A[4][2][2]), d^(-1)*a*d*a^(-A[4][3][2]),    c^(-1)*b^(-1)*c*b*a^(-A[5][1][1]), d^(-1)*b^(-1)*d*b*a^(-A[5][1][2]),d^(-1)*c^(-1)*d*c*a^(-A[5][2][1])];
+fi;
+
+if (l=4) then 
+f:=FreeGroup("a","b");
+a:=f.1;
+b:=f.2;
+g:=f/[a^A[3],b^A[4][1]*a^(-A[4][3]),b^(-1)*a*b*a^(-A[4][2])];
+fi;
+
+I:=IsomorphismSpecialPcGroup(g);
+g1:=Image(I);
+
+return g1;
+end);
+
+#################################################
+InstallGlobalFunction( DefiningCharacterOfCyclotomicAlgebra, function(A)
+local g1,d,m,n,i,chi,F,u,V,U,F1;
+
+g1:=DefiningGroupOfCyclotomicAlgebra(A);
+if Length(A)=2 then d:=1; fi;
+if Length(A)=4 then d:=A[4][1]; F1:=NF(A[3],[A[4][2]]); fi; 
+if (Length(A)=5 and Length(A[4])=2) then 
+   d:=A[4][1][1]*A[4][2][1]; 
+   F1:=NF(A[3],[A[4][1][2],A[4][2][2]]); 
+fi;
+if (Length(A)=5 and Length(A[4])=3) then 
+   d:=A[4][1][1]*A[4][2][1]*A[4][3][1]; 
+   F1:=NF(A[3],[A[4][1][2],A[4][2][2],A[4][3][2]]); 
+fi;
+
+n:=Size(Irr(g1)) ;
+m:=Trace(F1,Rationals,1);
+U:=[];
+for i in [1..n] do 
+chi:=Irr(g1)[n-i+1];
+V:=ValuesOfClassFunction(chi); 
+F:=FieldByGenerators(V);
+if V[1]/d in PositiveIntegers then 
+if Size(KernelOfCharacter(chi))=1 then 
+if FieldByGenerators(V)=F1 then 
+	Add(U,n-i+1); 
+fi; 
+fi;
+fi;
+od;
+if Size(U)=m then 
+u:=U[1];
+else
+u:=U;
+fi;
+
+return u;
+end);
+
+##########################################
+#  The next function was created to replace SimpleAlgebraByCharacterInfo
+#  before it was fixed to work over larger fields. 
+##########################################
+InstallGlobalFunction( SimpleComponentOfGroupRingByCharacter, function(F,G,n)
+local R,chi,B;
+
+R:=GroupRing(F,G);
+if IsPosInt(n) then
+  if HasOrdinaryCharacterTable(G) then
+    chi:=Irr(G)[n];
+  else
+    Error("The group has no ordinary character table yet. To avoid randomisation errors, you should compute it first\n");
+  fi;
+elif IsCharacter(n) then
+  chi:=n;
+else
+  Error("The third argument must be a character or its number\n");
+fi;      
+B:=SimpleAlgebraByCharacterInfo(R,chi);
+
+return B;
+end);
+
+#######################################################
+#  Global Character Descent functions - this 
+#  adds as much Clifford theory as is possible over 
+#  the global field before local methods need to be 
+#  used.  This is needed because wedderga's local index 
+#  functions are designed for crossed products that 
+#  have been reduced in this way.  
+#######################################################
+#######################################################
+# These functions are intended to provide an enhancement
+# to wedderga to extend its capabilities from small groups
+# to some medium-sized groups. Given chi Irr(G)[n] and a 
+# cyclotomic field K, you want to determine the simple 
+# component of KG corresponding to chi.  The algorithm 
+# initially searches the irreducible characters of 
+# maximal subgroups M for a constituent phi for which 
+# (chi_M, phi) is coprime to chi(1) and K(phi)=K, and 
+# when it finds such a pair (M,phi) it replaces (G,chi)
+# with (M,phi) and repeats.  This works because this 
+# condition implies the simple component of KM corresponding
+# to phi is Brauer equivalent to the simple component of KG
+# corresponding to chi. Once this process terminates it 
+# reverts to wedderga's functions for expressing the 
+# simple component. 
+#
+# The main computational barrier to its effectiveness is 
+# for some larger groups have too many maximal subgroups. 
+# Since it must store them all one can get memory crashes. 
+# Another issue is that there are groups with characters 
+# have no global reduction with arbitrarily large size, or 
+# the algorithm terminates too quickly to a subgroup that 
+# is still too large for wedderga to handle.  In these 
+# unlucky situations this algorithm will be a waste of time.  
+# 
+# For calculating the simple component of KG corresponding 
+# to chi = Irr(G)[n], the command is 
+#
+# SimpleComponentByCharacterDescent(K,G,n); 
+#
+# For the Wedderburn Decomposition of KG the command is 
+#
+# WedderburnDecompositionByCharacterDescent(K,G);
+#
+# (note that this differs from other wedderga functions since 
+# the input here is not the group ring). This will perform 
+# the calculation one character at a time, its performance 
+# is only saved because the maximal subgroup lattice won't be
+# recalculated each time. 
+################################################
+InstallGlobalFunction( CharacterDescent, function(F,G,n,e,H)
+local chi,M,m,r,y,U,F1,D,y1,i,psi,C,j,m1,F2,y2,chi1,k,n1;
+
+chi:=Irr(G)[n];
+m:=chi[1];
+r:=1;
+y:=PrimitiveElement(F);
+F1:=Field(Concatenation(chi,[y]));
+D:=[r,F1,G,n];
+y1:=PrimitiveElement(F1); 
+psi:=RestrictedClassFunction(chi,H); 
+C:=ConstituentsOfCharacter(psi);
+for j in [1..Size(C)] do 
+  m1:=ScalarProduct(psi,C[j]); 
+  if Gcd(m1,e)=1 then
+    F2:=Field(C[j]);
+    y2:=PrimitiveElement(F2); 
+    if y2 in F1 then 
+      for k in [1..Size(Irr(H))] do 
+        if Irr(H)[k]=C[j] then 
+          n1:=k;
+          r:=m/(ValuesOfClassFunction(C[j])[1]);
+          D:=[r,F1,H,k]; 
+          break;  
+        fi;
+      od; 
+    fi;
+  fi;
+od; 
+
+return D;
+end);          
+########################  
+InstallGlobalFunction( GlobalCharacterDescent, function(F,G,n)
+local e,r,t,y,V,F1,R,M,m,n1,s,i,H,D;
+
+e:=Size(G);
+r:=1;
+t:=0;
+y:=PrimitiveElement(F);
+V:=Concatenation(ValuesOfClassFunction(Irr(G)[n]),[y]);
+F1:=Field(V);
+R:=[r,F1,G,n];
+
+n1:=Irr(G)[n][1];
+if n1>1 then 
+while t=0 do 
+M:=MaximalSubgroups(R[3]);
+m:=Size(M);
+i:=m; 
+for i in [1..m] do   
+  H:=M[m-i+1];
+  D:=CharacterDescent(F1,R[3],R[4],e,H);
+  if Size(D[3])<Size(R[3]) then 
+    s:=n1/(Irr(D[3])[D[4]][1]);
+    R:=[r*s,F1,D[3],D[4]];
+    t:=1;
+    break;   
+  fi;
+od;
+if i=m and t=0 then t:=1; fi; 
+od;
+fi;
+
+return R; 
+end); 
+########################################
+InstallGlobalFunction( GaloisRepsOfCharacters, function(G)
+local U,T,n,i,F,m;
+
+U:=[];
+T:=Irr(G);
+n:=Size(Irr(G));
+i:=1; 
+while i in [1..n] do 
+ Add(U,i);
+ F:=Field(T[i]);
+ m:=Trace(F,Rationals,1);
+ i:=i+m;
+od;
+
+return U;
+end);
+###########################
+InstallGlobalFunction( SimpleComponentByCharacterDescent, function(F,G,n)
+local R,n1,n2,r,S,S0,T;
+
+n1:=Size(G);
+R:=GlobalCharacterDescent(F,G,n);
+n2:=Size(R[3]);
+r:=R[1];
+while n2<n1 do 
+  n2:=Size(R[3]);
+  R:=GlobalCharacterDescent(R[2],R[3],R[4]); 
+  n1:=Size(R[3]); 
+  r:=r*R[1];
+od; 
+T:=SimpleComponentOfGroupRingByCharacter(R[2],R[3],R[4]);
+T[1]:=r*T[1];
+
+T:=GlobalSplittingOfCyclotomicAlgebra(T);
+
+return T;
+end);
+###########################
+InstallGlobalFunction( WedderburnDecompositionByCharacterDescent, function(F,G)
+local R,S,y,n,U,F1,T;
+
+R:=[];
+S:=GaloisRepsOfCharacters(G);
+y:=PrimitiveElement(F);
+for n in S do
+  U:=Union(ValuesOfClassFunction(Irr(G)[n]),[y]);
+  F1:=Field(U);  
+  T:=SimpleComponentByCharacterDescent(F1,G,n);
+  Add(R,T); 
+od; 
+
+return R; 
+end);
+######################
 
 ################################
 # Given a simple component of a rational group algebra whose 
@@ -158,9 +688,6 @@ fi;
 
 return m;
 end);
-
-
-
 
 ####################################
 # Cyclotomic reciprocity calculation:
@@ -348,185 +875,6 @@ od;
 fi;
 
 return L1; 
-end);
-
-#######################################################
-# Finds group over which cyclotomic algebra of length 4 or 5 
-# is faithfully represented.
-#######################################################
-InstallGlobalFunction( DefiningGroupAndCharacterOfCyclotAlg, function(A)
-local l,f,a,b,c,d,g,I,g1,S,m,n,i,chi,F,u,V,U,F1;;
-
-l:=Length(A);
-g1:="fail";
-
-if (l=5 and Length(A[4])=2) then 
-f:=FreeGroup("a","b","c");
-a:=f.1;
-b:=f.2;
-c:=f.3;
-g:=f/[a^A[3],b^A[4][1][1]*a^(-A[4][1][3]),c^A[4][2][1]*a^(-A[4][2][3]),b^(-1)*a*b*a^(-A[4][1][2]),c^(-1)*a*c*a^(-A[4][2][2]),c^(-1)*b^(-1)*c*b*a^(-A[5][1][1])];
-fi;
-
-if (l=5 and Length(A[4])=3) then 
-f:=FreeGroup("a","b","c","d");
-a:=f.1;
-b:=f.2;
-c:=f.3;
-d:=f.4;
-g:=f/[a^A[3],b^A[4][1][1]*a^(-A[4][1][3]),c^A[4][2][1]*a^(-A[4][2][3]),d^A[4][3][1]*a^(-A[4][3][3]), b^(-1)*a*b*a^(-A[4][1][2]),c^(-1)*a*c*a^(-A[4][2][2]), d^(-1)*a*d*a^(-A[4][3][2]),    c^(-1)*b^(-1)*c*b*a^(-A[5][1][1]), d^(-1)*b^(-1)*d*b*a^(-A[5][1][2]),d^(-1)*c^(-1)*d*c*a^(-A[5][2][1])];
-fi;
-
-if (l=4) then 
-f:=FreeGroup("a","b");
-a:=f.1;
-b:=f.2;
-g:=f/[a^A[3],b^A[4][1]*a^(-A[4][3]),b^(-1)*a*b*a^(-A[4][2])];
-fi;
-
-I:=IsomorphismSpecialPcGroup(g);
-g1:=Image(I);
-
-S:=[];
-S[1]:=g1;
-
-if Length(A)=2 then d:=1; fi;
-if Length(A)=4 then d:=A[4][1]; F1:=NF(A[3],[A[4][2]]); fi; 
-if (Length(A)=5 and Length(A[4])=2) then 
-   d:=A[4][1][1]*A[4][2][1]; 
-   F1:=NF(A[3],[A[4][1][2],A[4][2][2]]); 
-fi;
-if (Length(A)=5 and Length(A[4])=3) then 
-   d:=A[4][1][1]*A[4][2][1]*A[4][3][1]; 
-   F1:=NF(A[3],[A[4][1][2],A[4][2][2],A[4][3][2]]); 
-fi;
-
-n:=Size(Irr(g1)) ;
-m:=Trace(F1,Rationals,1);
-U:=[];
-for i in [1..n] do 
-chi:=Irr(g1)[n-i+1];
-V:=ValuesOfClassFunction(chi); 
-F:=FieldByGenerators(V);
-if V[1]/d in PositiveIntegers then 
-if Size(KernelOfCharacter(chi))=1 then 
-if FieldByGenerators(V)=F1 then 
-	Add(U,n-i+1); 
-fi; 
-fi;
-fi;
-od;
-if Size(U)=m then 
-u:=U[1];
-chi:=Irr(g1)[u];
-else
-chi:=U;
-fi;
-
-S[2]:=chi;
-
-return S;
-end);
-
-#######################################################
-InstallGlobalFunction( DefiningGroupOfCyclotomicAlgebra, function(A)
-local l,f,a,b,c,d,g,I,g1;
-
-l:=Length(A);
-g1:="fail";
-
-if (l=5 and Length(A[4])=2) then 
-f:=FreeGroup("a","b","c");
-a:=f.1;
-b:=f.2;
-c:=f.3;
-g:=f/[a^A[3],b^A[4][1][1]*a^(-A[4][1][3]),c^A[4][2][1]*a^(-A[4][2][3]),b^(-1)*a*b*a^(-A[4][1][2]),c^(-1)*a*c*a^(-A[4][2][2]),c^(-1)*b^(-1)*c*b*a^(-A[5][1][1])];
-fi;
-
-if (l=5 and Length(A[4])=3) then 
-f:=FreeGroup("a","b","c","d");
-a:=f.1;
-b:=f.2;
-c:=f.3;
-d:=f.4;
-g:=f/[a^A[3],b^A[4][1][1]*a^(-A[4][1][3]),c^A[4][2][1]*a^(-A[4][2][3]),d^A[4][3][1]*a^(-A[4][3][3]), b^(-1)*a*b*a^(-A[4][1][2]),c^(-1)*a*c*a^(-A[4][2][2]), d^(-1)*a*d*a^(-A[4][3][2]),    c^(-1)*b^(-1)*c*b*a^(-A[5][1][1]), d^(-1)*b^(-1)*d*b*a^(-A[5][1][2]),d^(-1)*c^(-1)*d*c*a^(-A[5][2][1])];
-fi;
-
-if (l=4) then 
-f:=FreeGroup("a","b");
-a:=f.1;
-b:=f.2;
-g:=f/[a^A[3],b^A[4][1]*a^(-A[4][3]),b^(-1)*a*b*a^(-A[4][2])];
-fi;
-
-I:=IsomorphismSpecialPcGroup(g);
-g1:=Image(I);
-
-return g1;
-end);
-
-#################################################
-InstallGlobalFunction( DefiningCharacterOfCyclotomicAlgebra, function(A)
-local g1,d,m,n,i,chi,F,u,V,U,F1;
-
-g1:=DefiningGroupOfCyclotomicAlgebra(A);
-if Length(A)=2 then d:=1; fi;
-if Length(A)=4 then d:=A[4][1]; F1:=NF(A[3],[A[4][2]]); fi; 
-if (Length(A)=5 and Length(A[4])=2) then 
-   d:=A[4][1][1]*A[4][2][1]; 
-   F1:=NF(A[3],[A[4][1][2],A[4][2][2]]); 
-fi;
-if (Length(A)=5 and Length(A[4])=3) then 
-   d:=A[4][1][1]*A[4][2][1]*A[4][3][1]; 
-   F1:=NF(A[3],[A[4][1][2],A[4][2][2],A[4][3][2]]); 
-fi;
-
-n:=Size(Irr(g1)) ;
-m:=Trace(F1,Rationals,1);
-U:=[];
-for i in [1..n] do 
-chi:=Irr(g1)[n-i+1];
-V:=ValuesOfClassFunction(chi); 
-F:=FieldByGenerators(V);
-if V[1]/d in PositiveIntegers then 
-if Size(KernelOfCharacter(chi))=1 then 
-if FieldByGenerators(V)=F1 then 
-	Add(U,n-i+1); 
-fi; 
-fi;
-fi;
-od;
-if Size(U)=m then 
-u:=U[1];
-else
-u:=U;
-fi;
-
-return u;
-end);
-
-##########################################
-#  The next function was created to replace SimpleAlgebraByCharacterInfo
-#  before it was fixed to work over larger fields. 
-##########################################
-InstallGlobalFunction( SimpleComponentOfGroupRingByCharacter, function(F,G,n)
-local R,chi,B;
-
-R:=GroupRing(F,G);
-if IsPosInt(n) then
-  if HasOrdinaryCharacterTable(G) then
-    chi:=Irr(G)[n];
-  else
-    Error("The group has no ordinary character table yet. To avoid randomisation errors, you should compute it first\n");
-  fi;
-elif IsCharacter(n) then
-  chi:=n;
-else
-  Error("The third argument must be a character or its number\n");
-fi;      
-B:=SimpleAlgebraByCharacterInfo(R,chi);
-
-return B;
 end);
 
 ##########################################
@@ -1006,6 +1354,22 @@ end);
 #############################################
 InstallGlobalFunction( LocalIndicesOfCyclotomicAlgebra, function(A)
 local L,F,l,d,G,n,m0,m2,m,P,p,l1,i,L1;
+
+##################
+# bugfix lines (20/03/2020)
+##################
+if Length(A)>2 then 
+l:=Length(A);
+l1:=l-1; 
+while l1<l do 
+l:=Length(A);
+G:=DefiningGroupOfCyclotomicAlgebra(A);
+n:=DefiningCharacterOfCyclotomicAlgebra(A);
+A:=SimpleComponentByCharacterDescent(A[2],G,n);
+l1:=Length(A);
+od; 
+fi;
+##################
 
 L:=[];
 L1:=[];
