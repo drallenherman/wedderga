@@ -8,7 +8,7 @@
 #
 gap> START_TEST( "wedderga03.tst");
 
-# doc/SSP.xml:25-53
+# 4.9.5-Push56/doc/SSP.xml:25-53
 
 gap> ExtremelyStrongShodaPairs(DihedralGroup(32));
 [ [ <pc group of size 32 with 5 generators>, 
@@ -36,7 +36,7 @@ gap> ExtremelyStrongShodaPairs(SymmetricGroup(5));
 [ [ Sym( [ 1 .. 5 ] ), Sym( [ 1 .. 5 ] ) ], 
   [ Sym( [ 1 .. 5 ] ), Alt( [ 1 .. 5 ] ) ] ]
 
-# doc/SSP.xml:80-95
+# 4.9.5-Push56/doc/SSP.xml:80-95
 
 gap> ssp:=StrongShodaPairs( SymmetricGroup(4) );;
 gap> Length(ssp);
@@ -51,7 +51,7 @@ gap> List(ssp,x->List(x,StructureDescription));
 [ [ "D64", "D64" ], [ "D64", "D32" ], [ "D64", "C32" ], [ "D64", "D32" ], 
   [ "D32", "D16" ], [ "C32", "C4" ], [ "C32", "C2" ], [ "C32", "1" ] ]
 
-# doc/SSP.xml:118-132
+# 4.9.5-Push56/doc/SSP.xml:118-132
 
 gap> G:=SymmetricGroup(4);; K:=Group( (1,3,2,4), (3,4) );;
 gap> H1:=Group( (2,4,3), (1,4)(2,3), (1,3)(2,4) );;
@@ -65,7 +65,7 @@ false
 gap> IsExtremelyStrongShodaPair( G, G, K );
 false
 
-# doc/SSP.xml:153-167
+# 4.9.5-Push56/doc/SSP.xml:153-167
 
 gap> G:=SymmetricGroup(4);; K:=Group( (1,3,2,4), (3,4) );;
 gap> H1:=Group( (2,4,3), (1,4)(2,3), (1,3)(2,4) );;
@@ -79,7 +79,7 @@ true
 gap> IsStrongShodaPair( G, G, K );
 false
 
-# doc/SSP.xml:187-197
+# 4.9.5-Push56/doc/SSP.xml:187-197
 
 gap> G:=AlternatingGroup(5);;
 gap> K:=AlternatingGroup(4);;
@@ -89,7 +89,7 @@ false
 gap> IsShodaPair( G, K, H );
 true
 
-# doc/SSP.xml:212-228
+# 4.9.5-Push56/doc/SSP.xml:212-228
 
 gap> S4:=SymmetricGroup(4);;
 gap> IsStronglyMonomial(S4);
@@ -105,7 +105,7 @@ true
 gap> IsStronglyMonomial(G);
 false
 
-# doc/SSP.xml:243-266
+# 4.9.5-Push56/doc/SSP.xml:243-266
 
 gap>  D24:=DihedralGroup(24);
 <pc group of size 24 with 4 generators>

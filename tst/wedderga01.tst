@@ -8,7 +8,7 @@
 #
 gap> START_TEST( "wedderga01.tst");
 
-# doc/intro.xml:139-162
+# 4.9.5-Push56/doc/intro.xml:139-162
 
 gap> QG := GroupRing( Rationals, SymmetricGroup(4) );
 <algebra-with-one over Rationals, with 2 generators>

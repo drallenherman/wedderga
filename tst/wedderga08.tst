@@ -8,7 +8,7 @@
 #
 gap> START_TEST( "wedderga08.tst");
 
-# doc/applications.xml:26-39
+# 4.9.5-Push56/doc/applications.xml:26-39
 
 gap> G:=DihedralGroup(8);;
 gap> F:=GF(3);;          
@@ -21,7 +21,7 @@ gap> S:=AsSet(G);
 gap> CodeWordByGroupRingElement(F,S,a);
 [ Z(3)^0, Z(3)^0, Z(3)^0, Z(3)^0, Z(3)^0, 0*Z(3), Z(3)^0, Z(3) ]
 
-# doc/applications.xml:61-94
+# 4.9.5-Push56/doc/applications.xml:61-94
 
 gap> G:=DihedralGroup(8);;
 gap> F:=GF(3);;          
